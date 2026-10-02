@@ -382,6 +382,30 @@ footer .fin{margin-top:30px;font-size:10px;letter-spacing:.24em;text-transform:u
 
 <script>
 let LUNCH={price:0,time:{},days:[]}, CATS=[], META={};
+
+const T={
+ ru:{lunch:"Бизнес-ланч",per:"за комплекс",show:"Показать официанту",order:"Заказ",
+     hint:"Покажите экран официанту",total:"Итого",addr:"ул. Д. Нурпеисовой, 17/1 · Уральск",
+     wknd:"По субботам и воскресеньям бизнес-ланча нет. Показан понедельник.",
+     empty:"Ничего не выбрано",flowers:"Цветы",
+     h1a:"Завтрак, обед",h1b:"и долгий вечер.",
+     lede:"Сезонная кухня в центре Уральска. Бизнес-ланч с понедельника по пятницу.",
+     toMenu:"Смотреть меню",scroll:"ЛИСТАЙТЕ"},
+ kz:{lunch:"Бизнес-ланч",per:"кешен үшін",show:"Даяшыға көрсету",order:"Тапсырыс",
+     hint:"Экранды даяшыға көрсетіңіз",total:"Барлығы",addr:"Д. Нұрпейісова көшесі, 17/1 · Орал",
+     wknd:"Сенбі мен жексенбіде бизнес-ланч жоқ. Дүйсенбі көрсетілген.",
+     empty:"Ештеңе таңдалмаған",flowers:"Гүлдер",
+     h1a:"Таңғы ас, түскі ас",h1b:"және ұзақ кеш.",
+     lede:"Орал орталығындағы маусымдық ас. Дүйсенбіден жұмаға дейін бизнес-ланч.",
+     toMenu:"Мәзірді қарау",scroll:"ТӨМЕН"},
+ en:{lunch:"Business lunch",per:"per set",show:"Show to waiter",order:"Order",
+     hint:"Show this screen to your waiter",total:"Total",addr:"17/1 D. Nurpeisova St · Uralsk",
+     wknd:"No business lunch on Saturday and Sunday. Monday is shown.",
+     empty:"Nothing selected",flowers:"Flowers",
+     h1a:"Breakfast, lunch",h1b:"and long evenings.",
+     lede:"Seasonal kitchen in central Uralsk. Business lunch Monday to Friday.",
+     toMenu:"View menu",scroll:"SCROLL"}
+};
 /* ═══════════════════════════════════════ */
 
 const LOGO=document.querySelector(".top .mk").src;
