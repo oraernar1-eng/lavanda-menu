@@ -1,33 +1,39 @@
-app = "lavanda-menu"
-primary_region = "fra"
+# fly.toml app configuration file generated for lavanda-menu on 2026-10-02T12:18:12Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'lavanda-menu'
+primary_region = 'fra'
 
 [build]
 
 [env]
-  PORT = "8080"
+  PORT = '8080'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = "suspend"
+  auto_stop_machines = 'suspend'
   auto_start_machines = true
   min_machines_running = 0
 
   [http_service.concurrency]
-    type = "requests"
-    soft_limit = 200
+    type = 'requests'
     hard_limit = 400
+    soft_limit = 200
 
 [checks]
   [checks.up]
-    type = "http"
     port = 8080
-    path = "/healthz"
-    interval = "30s"
-    timeout = "4s"
-    grace_period = "10s"
+    type = 'http'
+    interval = '30s'
+    timeout = '4s'
+    grace_period = '10s'
+    path = '/healthz'
 
 [[vm]]
-  memory = "512mb"
-  cpu_kind = "shared"
+  memory = '512mb'
+  cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 512
