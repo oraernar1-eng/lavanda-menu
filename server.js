@@ -29,31 +29,15 @@ const LOCAL = process.env.DATA_DIR || path.join(__dirname, "data");
 let s3 = null;
 
 if (CLOUD) {
-  const { S3Client, GetObjectCommand, PutObjectCommand, ListObjectsV2Command, DeleteObjectCommand } =
-    await import("@aws-sdk/client-s3");
-  const client = new S3Client({
-    region: process.env.AWS_REGION || "auto",
-    endpoint: ENDPOINT,
-    forcePathStyle: true,
-    credentials: { accessKeyId: KEY, secretAccessKey: SECRETK }
-  });
-  const body = async (r) => Buffer.concat(await r.Body.toArray());
+  const { makeS3 } = await import("./s3.js");
+  const c = makeS3({ endpoint: ENDPOINT, region: process.env.AWS_REGION || "auto",
+                     bucket: BUCKET, key: KEY, secret: SECRETK });
   s3 = {
-    async get(key) {
-      try {
-        const r = await client.send(new GetObjectCommand({ Bucket: BUCKET, Key: key }));
-        return { buf: await body(r), type: r.ContentType };
-      } catch { return null; }
-    },
-    put: (key, buf, type) => client.send(new PutObjectCommand({
-      Bucket: BUCKET, Key: key, Body: buf, ContentType: type,
-      CacheControl: key.startsWith("dishes/") ? "public, max-age=31536000, immutable" : "no-store"
-    })),
-    list: async (prefix) => {
-      const r = await client.send(new ListObjectsV2Command({ Bucket: BUCKET, Prefix: prefix }));
-      return (r.Contents || []).map(o => o.Key).sort();
-    },
-    del: (key) => client.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }))
+    get: (k) => c.get(k),
+    put: (k, buf, type) => c.put(k, buf, type,
+      k.startsWith("dishes/") ? "public, max-age=31536000, immutable" : "no-store"),
+    list: (p) => c.list(p),
+    del: (k) => c.del(k)
   };
   console.log("Хранилище: облако, бакет " + BUCKET);
 } else {
