@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lavanda — управление меню</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Forum&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#190E1B; --panel:#241529; --line:rgba(201,168,106,.26);
+  --cream:#F4EBCD; --dim:rgba(244,235,205,.52); --gold:#C9A86A;
+  --ok:#6FBF8A; --bad:#D98B7A;
+  --ui:"Golos Text",system-ui,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--ui);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+input,textarea,select{background:#140B16;border:1px solid var(--line);color:var(--cream);
+  padding:9px 11px;width:100%;border-radius:0;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+
+/* вход */
+.gate{min-height:100svh;display:grid;place-items:center;padding:20px}
+.gate form{width:100%;max-width:330px;text-align:center}
+.gate img{width:84px;height:84px;border-radius:50%;margin:0 auto 26px;display:block}
+.gate h1{font-family:Forum,serif;font-size:21px;letter-spacing:.26em;text-indent:.26em;margin:0 0 28px;font-weight:400}
+.gate input{text-align:center;letter-spacing:.2em;margin-bottom:12px}
+
+/* панель */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(25,14,27,.96);
+  border-bottom:1px solid var(--line);padding:11px 16px;display:flex;gap:10px;align-items:center}
+.bar .t{flex:1;font-family:Forum,serif;letter-spacing:.2em;font-size:14px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.btn{padding:10px 17px;border:1px solid var(--line);white-space:nowrap;font-size:13px;font-weight:500}
+.btn.gold{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600}
+.btn.gold[disabled]{opacity:.4}
+.btn.sm{padding:6px 11px;font-size:12px}
+.msg{font-size:12.5px;padding:0 16px;height:0;overflow:hidden;transition:height .2s}
+.msg.on{height:30px;line-height:30px}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+
+.tabs{display:flex;gap:18px;overflow-x:auto;padding:14px 16px 0;border-bottom:1px solid var(--line)}
+.tabs button{padding:8px 0 11px;font-size:13px;color:var(--dim);border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--cream);border-bottom-color:var(--gold)}
+
+section{padding:20px 0 70px}
+h2{font-family:Forum,serif;font-weight:400;font-size:22px;margin:26px 0 12px;letter-spacing:.04em}
+h2:first-child{margin-top:4px}
+
+.cat{border:1px solid var(--line);margin-bottom:16px;background:var(--panel)}
+.cat>summary{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none}
+.cat>summary::-webkit-details-marker{display:none}
+.cat>summary b{flex:1;font-weight:600}
+.cat>summary span{font-size:12px;color:var(--dim)}
+.cat .inner{padding:0 14px 14px}
+
+.dish{border-top:1px solid rgba(244,235,205,.1);padding:14px 0}
+.dish.off{opacity:.5}
+.row{display:flex;gap:9px;align-items:center;margin-bottom:9px;flex-wrap:wrap}
+.row>*{min-width:0}
+.grow{flex:1 1 150px}
+.w90{flex:0 0 92px} .w70{flex:0 0 74px}
+label{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.thumb{width:54px;height:54px;flex:0 0 auto;border:1px solid var(--line);border-radius:50%;
+  overflow:hidden;background:#140B16;display:grid;place-items:center;font-size:10px;color:var(--dim)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--dim);white-space:nowrap}
+.chk input{width:16px;height:16px;flex:0 0 auto}
+.tags{display:flex;gap:7px;flex-wrap:wrap}
+.del{color:var(--bad);font-size:12px;border:1px solid rgba(217,139,122,.4);padding:6px 10px}
+
+.days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.days button{flex:1;min-width:58px;padding:9px 0;border:1px solid var(--line);font-size:13px;color:var(--dim)}
+.days button.on{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600}
+.hint{font-size:12.5px;color:var(--dim);margin:0 0 14px;line-height:1.6}
+.save{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top,var(--ink) 65%,transparent);display:flex;gap:10px;justify-content:center}
+.save .btn.gold{min-width:210px;text-align:center}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <form id="loginForm">
+    <img src="{{MEDIA}}/media/logo.webp" alt="">
+    <h1>УПРАВЛЕНИЕ</h1>
+    <input type="password" id="pw" placeholder="Пароль" autocomplete="current-password">
+    <button class="btn gold" style="width:100%" type="submit">Войти</button>
+    <p class="hint" id="loginMsg" style="margin-top:14px"></p>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <div class="bar">
+    <div class="t">LAVANDA · МЕНЮ</div>
+    <a class="btn sm" href="/" target="_blank">Сайт</a>
+    <button class="btn sm" id="out">Выйти</button>
+  </div>
+  <div class="msg" id="msg"></div>
+
+  <div class="tabs">
+    <button data-tab="menu" class="on">Блюда</button>
+    <button data-tab="lunch">Бизнес-ланч</button>
+  </div>
+
+  <div class="wrap">
+    <section id="tab-menu"></section>
+    <section id="tab-lunch" class="hidden"></section>
+  </div>
+
+  <div class="save">
+    <button class="btn gold" id="saveBtn">Сохранить и опубликовать</button>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const LANGS = [["ru","Русский"],["kz","Қазақша"],["en","English"]];
+const TAGS  = [["halal","халал"],["spicy","остро"],["veg","вег"],["hit","хит"]];
+let data = null, dirty = false, day = 0;
+
+function note(text, bad){
+  const m = $("#msg");
+  m.textContent = text;
+  m.className = "msg on " + (bad ? "bad" : "ok");
+  clearTimeout(note.t);
+  note.t = setTimeout(() => { m.className = "msg"; }, 3500);
+}
+function touch(){ dirty = true; $("#saveBtn").textContent = "Сохранить и опубликовать"; }
+addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+/* ── вход ── */
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const r = await fetch("/api/login", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: $("#pw").value })
+  });
+  if (r.ok) start(); else $("#loginMsg").textContent = "Неверный пароль";
+});
+$("#out").addEventListener("click", async () => {
+  await fetch("/api/logout", { method: "POST" });
+  location.reload();
+});
+
+async function start(){
+  const r = await fetch("/api/menu", { cache: "no-store" });
+  data = await r.json();
+  $("#gate").classList.add("hidden");
+  $("#app").classList.remove("hidden");
+  renderMenu(); renderLunch();
+}
+
+/* ── вкладки ── */
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x === b));
+  $("#tab-menu").classList.toggle("hidden", b.dataset.tab !== "menu");
+  $("#tab-lunch").classList.toggle("hidden", b.dataset.tab !== "lunch");
+}));
+
+/* ── блюда ── */
+function renderMenu(){
+  const host = $("#tab-menu");
+  host.innerHTML = '<p class="hint">Разверните категорию, чтобы менять блюда. Галочка «нет» ставит блюдо в стоп-лист: гость увидит его серым и не сможет выбрать. Вес 0 — не показывать.</p>';
+  data.cats.forEach((c, ci) => {
+    const d = document.createElement("details");
+    d.className = "cat";
+    const off = c.items.filter(i => i.off).length;
+    d.innerHTML = '<summary><b>' + c.ru + '</b><span>' + c.items.length + ' поз.' +
+      (off ? ' · ' + off + ' в стопе' : '') + '</span></summary><div class="inner"></div>';
+    const inner = d.querySelector(".inner");
+    c.items.forEach((it, ii) => inner.appendChild(dishRow(c, it, ci, ii)));
+    const add = document.createElement("button");
+    add.className = "btn sm"; add.style.marginTop = "12px"; add.textContent = "+ Добавить блюдо";
+    add.onclick = () => {
+      c.items.push({ id: "x" + Date.now().toString(36), ru:"Новое блюдо", kz:"", en:"",
+        dru:"", dkz:"", den:"", p:0, g:0, img:"", off:false, tags:[] });
+      touch(); renderMenu();
+      host.querySelectorAll("details")[ci].open = true;
+    };
+    inner.appendChild(add);
+    host.appendChild(d);
+  });
+}
+
+function dishRow(cat, it, ci, ii){
+  const box = document.createElement("div");
+  box.className = "dish" + (it.off ? " off" : "");
+
+  const head = document.createElement("div");
+  head.className = "row";
+  head.innerHTML = '<div class="thumb">' + (it.img ? '<img src="' + it.img + '">' : "фото") + '</div>';
+  const names = document.createElement("div");
+  names.className = "grow";
+  names.innerHTML = '<label>Название · РУС</label>';
+  const nru = document.createElement("input");
+  nru.value = it.ru || ""; nru.oninput = () => { it.ru = nru.value; touch(); };
+  names.appendChild(nru);
+  head.appendChild(names);
+  box.appendChild(head);
+
+  const r2 = document.createElement("div"); r2.className = "row";
+  [["kz","ҚАЗ"],["en","ENG"]].forEach(([k, t]) => {
+    const w = document.createElement("div"); w.className = "grow";
+    w.innerHTML = '<label>Название · ' + t + '</label>';
+    const inp = document.createElement("input");
+    inp.value = it[k] || ""; inp.oninput = () => { it[k] = inp.value; touch(); };
+    w.appendChild(inp); r2.appendChild(w);
+  });
+  box.appendChild(r2);
+
+  const r3 = document.createElement("div"); r3.className = "row";
+  LANGS.forEach(([k, t]) => {
+    const w = document.createElement("div"); w.className = "grow";
+    w.innerHTML = '<label>Описание · ' + t + '</label>';
+    const inp = document.createElement("input");
+    inp.value = it["d" + k] || ""; inp.oninput = () => { it["d" + k] = inp.value; touch(); };
+    w.appendChild(inp); r3.appendChild(w);
+  });
+  box.appendChild(r3);
+
+  const r4 = document.createElement("div"); r4.className = "row";
+  const price = document.createElement("div"); price.className = "w90";
+  price.innerHTML = '<label>Цена ₸</label>';
+  const pi = document.createElement("input");
+  pi.type = "number"; pi.min = "0"; pi.value = it.p || 0;
+  pi.oninput = () => { it.p = Math.max(0, +pi.value || 0); touch(); };
+  price.appendChild(pi); r4.appendChild(price);
+
+  const gram = document.createElement("div"); gram.className = "w70";
+  gram.innerHTML = '<label>Вес, г</label>';
+  const gi = document.createElement("input");
+  gi.type = "number"; gi.min = "0"; gi.value = it.g || 0;
+  gi.oninput = () => { it.g = Math.max(0, +gi.value || 0); touch(); };
+  gram.appendChild(gi); r4.appendChild(gram);
+
+  const stop = document.createElement("label"); stop.className = "chk";
+  const si = document.createElement("input");
+  si.type = "checkbox"; si.checked = !!it.off;
+  si.onchange = () => { it.off = si.checked; touch(); box.classList.toggle("off", si.checked); };
+  stop.appendChild(si); stop.append("нет сегодня");
+  r4.appendChild(stop);
+  box.appendChild(r4);
+
+  const r5 = document.createElement("div"); r5.className = "row";
+  const tg = document.createElement("div"); tg.className = "tags grow";
+  TAGS.forEach(([k, t]) => {
+    const l = document.createElement("label"); l.className = "chk";
+    const c = document.createElement("input");
+    c.type = "checkbox"; c.checked = (it.tags || []).includes(k);
+    c.onchange = () => {
+      it.tags = it.tags || [];
+      c.checked ? it.tags.push(k) : (it.tags = it.tags.filter(x => x !== k));
+      touch();
+    };
+    l.appendChild(c); l.append(t); tg.appendChild(l);
+  });
+  r5.appendChild(tg);
+
+  const up = document.createElement("label"); up.className = "btn sm"; up.textContent = "Фото";
+  const fi = document.createElement("input");
+  fi.type = "file"; fi.accept = "image/*"; fi.style.display = "none";
+  fi.onchange = async () => {
+    if (!fi.files[0]) return;
+    up.textContent = "…";
+    const fd = new FormData(); fd.append("photo", fi.files[0]);
+    const r = await fetch("/api/upload", { method: "POST", body: fd });
+    const j = await r.json().catch(() => ({}));
+    up.textContent = "Фото";
+    if (!r.ok) return note(j.error || "Фото не загрузилось", true);
+    it.img = j.url; touch(); renderMenu(); note("Фото загружено");
+  };
+  up.appendChild(fi); r5.appendChild(up);
+
+  const del = document.createElement("button");
+  del.className = "del"; del.textContent = "Удалить";
+  del.onclick = () => {
+    if (!confirm("Удалить «" + (it.ru || "блюдо") + "»?")) return;
+    cat.items.splice(ii, 1); touch(); renderMenu();
+  };
+  r5.appendChild(del);
+  box.appendChild(r5);
+  return box;
+}
+
+/* ── бизнес-ланч ── */
+function renderLunch(){
+  const host = $("#tab-lunch");
+  host.innerHTML = "";
+
+  const top = document.createElement("div"); top.className = "row";
+  const p = document.createElement("div"); p.className = "w90";
+  p.innerHTML = '<label>Цена ₸</label>';
+  const pi = document.createElement("input");
+  pi.type = "number"; pi.value = data.lunch.price || 0;
+  pi.oninput = () => { data.lunch.price = +pi.value || 0; touch(); };
+  p.appendChild(pi); top.appendChild(p);
+  host.appendChild(top);
+
+  const t = document.createElement("div"); t.className = "row";
+  LANGS.forEach(([k, lab]) => {
+    const w = document.createElement("div"); w.className = "grow";
+    w.innerHTML = '<label>Время · ' + lab + '</label>';
+    const inp = document.createElement("input");
+    inp.value = (data.lunch.time[k] || "").replace(/<br>/g, " / ");
+    inp.oninput = () => { data.lunch.time[k] = inp.value.replace(" / ", "<br>"); touch(); };
+    w.appendChild(inp); t.appendChild(w);
+  });
+  host.appendChild(t);
+
+  const h = document.createElement("h2"); h.textContent = "Состав по дням";
+  host.appendChild(h);
+  const hint = document.createElement("p"); hint.className = "hint";
+  hint.textContent = "Одна строка — одно блюдо. Пустые строки не показываются.";
+  host.appendChild(hint);
+
+  const tabs = document.createElement("div"); tabs.className = "days";
+  data.lunch.days.forEach((d, i) => {
+    const b = document.createElement("button");
+    b.textContent = d.ru; b.className = i === day ? "on" : "";
+    b.onclick = () => { day = i; renderLunch(); };
+    tabs.appendChild(b);
+  });
+  host.appendChild(tabs);
+
+  const d = data.lunch.days[day];
+  LANGS.forEach(([k, lab]) => {
+    const w = document.createElement("div"); w.style.marginBottom = "14px";
+    w.innerHTML = '<label>' + lab + '</label>';
+    const ta = document.createElement("textarea");
+    ta.rows = 6; ta.value = (d[k + "_"] || []).join("\n");
+    ta.oninput = () => {
+      d[k + "_"] = ta.value.split("\n").map(s => s.trim()).filter(Boolean);
+      touch();
+    };
+    w.appendChild(ta); host.appendChild(w);
+  });
+}
+
+/* ── сохранение ── */
+$("#saveBtn").addEventListener("click", async () => {
+  const b = $("#saveBtn");
+  b.disabled = true; b.textContent = "Сохраняю…";
+  try {
+    const r = await fetch("/api/menu", {
+      method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    if (r.status === 401) { note("Сессия истекла, войдите заново", true); location.reload(); return; }
+    if (!r.ok) throw 0;
+    dirty = false;
+    b.textContent = "Опубликовано";
+    note("Меню обновлено — гости видят изменения сразу");
+  } catch {
+    note("Не сохранилось. Проверьте интернет и попробуйте ещё раз", true);
+    b.textContent = "Сохранить и опубликовать";
+  } finally { b.disabled = false; }
+});
+
+fetch("/api/session").then(r => r.json()).then(j => { if (j.auth) start(); });
+</script>
+</body>
+</html>
